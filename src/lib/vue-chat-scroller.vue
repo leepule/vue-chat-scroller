@@ -1,6 +1,6 @@
 <template>
   <div class="vue-chat-scroller" ref="scroller">
-    <ul class="vue-chat-list" :style="{paddingTop: `${startItem * 20}px`}">
+    <ul class="vue-chat-list" :style="{paddingTop: `${currentHeight}px`}">
       <div class="pulldown" :style="{height: `${pullDownBlockY}px`}" v-show="pullDownBlockY > 5">
         <span v-show="(pullDownBlockY < (options.pullDownRefresh.threshold || 40)) && !loadingData">
           <slot name="pulldown-pull-to-load">
@@ -19,7 +19,7 @@
         </span>
       </div>
       <!--  :style="{visibility: item.height >= currentHeight - 500 ? 'visible': 'hidden'}" -->
-      <li :ref="`${itemClass}-${item.data.index}`" v-for="(item, index) in visibleItems" :class="`${itemClass}-${item.data.index}`" :key="item.data.index" :data-height="item.height">
+      <li :ref="`${itemClass}-${item.data.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.data.index}`" :key="item.data.index" :data-height="item.height">
         <slot name="item" :data="item.data" :height="item.height"></slot>
       </li>
     </ul>
@@ -42,6 +42,7 @@ export default {
       scrollToElementCallBackBoolean: false,
       currentHeight: 0,
       startItem: 0,
+      windowHeight: 0
     }
   },
   props: {
@@ -78,15 +79,16 @@ export default {
   computed: {
     scrollPaddingTop() {
       if (this.scroll) {
-        return (this.scroll.scrollerHeight / 2 - 667)
-      } else {
-        return 0
+        // if (this.scrollerHeight < - this.windowHeight) {
+          return (this.scroll.scrollerHeight / 2 - this.windowHeight)
+        // }
       }
+      return 0
     },
     visibleItems() {
       // return this.items.slice()
       return this.items.slice(Math.max(0, this.startItem - this.size), Math.min(this.items.length, this.startItem + this.size))
-    }
+    },
   },
   watch: {
     chatList() {
@@ -112,7 +114,7 @@ export default {
       this.scroll = new BScroll(this.$refs.scroller, this.options)
       window.scroll = this.scroll
       this.loadHistory()
-      console.log(scroll)
+      this.windowHeight = this.$el.offsetHeight
       this.scroll.on('scroll', this._onScroll)
       this.scroll.on('pullingDown', this._onPullingDown)
       this.scroll.on('refresh', this._onRefresh)
@@ -121,9 +123,12 @@ export default {
   methods: {
     _onScroll(pos) {
       console.log('onScroll', pos)
-      this.currentHeight = Math.abs(pos.y)
+      this.currentHeight = pos.y < 0 ? Math.abs(pos.y) : 0
       this._setPullDownBlockY(pos)
       this._updateStartItem(pos)
+      if (pos.y < 0) {
+        this.scroll.refresh()
+      }
     },
     _onPullingDown() {
       if (this.chatList.length > 0) {
@@ -136,6 +141,11 @@ export default {
       console.log('_onRefresh')
       if (this.scrollToElementCallBackBoolean === true) {
         this.scroll.scrollToElement(this.topItem, 0, false, -(this.options.pullDownRefresh.threshold || 40))
+        setTimeout(() => {
+          this._setPullDownBlockY({
+            y: 0
+          })
+        }, 60)
         this.scrollToElementCallBackBoolean = false
       }
     },
@@ -154,7 +164,7 @@ export default {
           break
         }
       }
-      this.scroll.refresh()
+      // this.scroll.refresh()
     },
     _setItem() {
       this.items = []

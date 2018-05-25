@@ -30,11 +30,12 @@ export default {
       chatList: [],
       options: {
         scrollbar: true,
-        probeType: 2,
+        probeType: 3,
         pullDownRefresh: {
           threshold: 40,
           stop: 40
         },
+        observeDOM: false
       }
     }
   },
