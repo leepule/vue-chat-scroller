@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <vue-chat-scroller :options="options" :chatList="chatList" :loadHistory="loadHistory" @onPullingDown="loadHistory" :size="size" ref="scroller">
+    <vue-chat-scroller :options="options" :chatList="chatList" @onPullingDown="loadHistory" :size="size" ref="scroller">
       <template slot="item" slot-scope="scope">
         <div>
           {{scope.data}} : {{scope.height}}
