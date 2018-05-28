@@ -1,6 +1,6 @@
 <template>
   <div class="vue-chat-scroller" ref="scroller">
-    <ul class="vue-chat-list" :style="{paddingTop: `${currentHeight}px`}">
+    <ul class="vue-chat-list" :style="{paddingTop: `${listPaddingTop}px`, paddingBottom: `${listPaddingBottom}px`}">
       <div class="pulldown" :style="{height: `${pullDownBlockY}px`}" v-show="pullDownBlockY > 5">
         <span v-show="(pullDownBlockY < (options.pullDownRefresh.threshold || 40)) && !loadingData">
           <slot name="pulldown-pull-to-load">
@@ -19,8 +19,8 @@
         </span>
       </div>
       <!--  :style="{visibility: item.height >= currentHeight - 500 ? 'visible': 'hidden'}" -->
-      <li :ref="`${itemClass}-${item.data.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.data.index}`" :key="item.data.index" :data-height="item.height">
-        <slot name="item" :data="item.data" :height="item.height"></slot>
+      <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index}`" :key="item.data" :style="{'height': `${item.height}px`}">
+        <slot name="item" :data="item.data" :height="item.__height__"></slot>
       </li>
     </ul>
   </div>
@@ -42,7 +42,9 @@ export default {
       scrollToElementCallBackBoolean: false,
       currentHeight: 0,
       startItem: 0,
-      windowHeight: 0
+      windowHeight: 0,
+      start: 0,
+      end: 0,
     }
   },
   props: {
@@ -70,43 +72,51 @@ export default {
     size: {
       type: Number,
       default: 50
-    },
-    displayItemSize: {
-      type: Number,
-      default: 100,
     }
   },
   computed: {
-    scrollPaddingTop() {
-      if (this.scroll) {
-        // if (this.scrollerHeight < - this.windowHeight) {
-          return (this.scroll.scrollerHeight / 2 - this.windowHeight)
-        // }
-      }
-      return 0
-    },
     visibleItems() {
       // return this.items.slice()
-      return this.items.slice(Math.max(0, this.startItem - this.size), Math.min(this.items.length, this.startItem + this.size))
+      /**
+       * 保证滑动到底部一定有100个dom
+       * 如果 startItem - size + size * 2 >= startItem + size
+       * return startItem - size
+       **/
+      this.end = Math.min(this.items.length, this.startItem + this.size > this.size * 2 ? this.startItem + this.size : this.size * 2)
+      if (this.end === this.items.length) {
+        this.start = (this.end - this.size * 2) >= 0 ? (this.end - this.size * 2) : 0
+      } else {
+        this.start = Math.max(0, this.startItem - this.size)
+      }
+      return this.items.slice(this.start, this.end)
+      // return this.items.slice(Math.max(0, this.startItem - this.size), Math.min(this.items.length, (this.startItem + this.size) >= (this.startItem + this.size * 2) ? (this.starItem + this.size) : (this.startItem + this.size * 2)))
     },
+    listTotalHeight() {
+      let height = 0
+      this.items.forEach(item => {
+        height += item.height
+      })
+      return height
+    },
+    listPaddingTop() {
+      return this.visibleItems[0] ? ((this.visibleItems[0].__height__ - this.visibleItems[0].height) > 0 ? (this.visibleItems[0].__height__ - this.visibleItems[0].height) : 0) : 0
+    },
+    listPaddingBottom() {
+      return this.listTotalHeight - this.listPaddingTop - this.showableHeight
+    },
+    showableHeight() {
+      let height = 0
+      this.visibleItems.forEach((item) => {
+        height += item.height
+      })
+      return height
+    }
   },
   watch: {
     chatList() {
       this._setItem()
     }
   },
-  // watch: {
-  //   scrollToHeight(newVal, oldVal) {
-  //     this.$nextTick(() => {
-  //       console.log('old scroll height:', this.oldScrollHeight)
-  //       console.log('new scroll height:', this.newScrollHeight)
-  //       console.log(this.scrollToHeight)
-  //       if (this.oldScrollHeight !== 0) {
-  //         this.scroll.scrollTo(0, -this.scrollToHeight, 0)
-  //       }
-  //     })
-  //   }
-  // },
   created() {
   },
   mounted() {
@@ -122,11 +132,10 @@ export default {
   },
   methods: {
     _onScroll(pos) {
-      console.log('onScroll', pos)
       this.currentHeight = pos.y < 0 ? Math.abs(pos.y) : 0
       this._setPullDownBlockY(pos)
       this._updateStartItem(pos)
-      if (pos.y < 0) {
+      if (pos.y < 0 && this.visibleItems.length >= this.size * 2) {
         this.scroll.refresh()
       }
     },
@@ -138,7 +147,6 @@ export default {
       this.$emit('onPullingDown')
     },
     _onRefresh() {
-      console.log('_onRefresh')
       if (this.scrollToElementCallBackBoolean === true) {
         this.scroll.scrollToElement(this.topItem, 0, false, -(this.options.pullDownRefresh.threshold || 40))
         setTimeout(() => {
@@ -158,8 +166,7 @@ export default {
     },
     _updateStartItem(pos) {
       for (let i = 0; i < this.items.length; i++) {
-        if (this.items[i].height > this.currentHeight) {
-          console.log('_updateStartItem', this.items[i].height  + ':' + this.currentHeight)
+        if (this.items[i].__height__ > this.currentHeight) {
           this.startItem = Math.max(0, i)
           break
         }
@@ -168,15 +175,25 @@ export default {
     },
     _setItem() {
       this.items = []
+      let index = 0
       let heightCounter = 0
       this.chatList.forEach((item, index) => {
-        heightCounter = heightCounter + 20
+        heightCounter += heightCounter + item.height ? item.height : 80
         this.items.push({
-          data: item,
-          height: heightCounter
+          data: item.data,
+          index: ++index,
+          height: item.height,
+          __height__: heightCounter
         })
       })
       this.$forceUpdate()
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        console.log(this.listTotalHeight)
+        this.scroll.scrollTo(0, -this.listTotalHeight, 5000)
+        this.scroll.refresh()
+      })
     },
     // export api finishPullDown
     finishPullDown() {

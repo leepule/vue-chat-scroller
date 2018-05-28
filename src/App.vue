@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <vue-chat-scroller :options="options" :chatList="chatList" :loadHistory="loadHistory" @onPullingDown="loadHistory" ref="scroller">
+    <vue-chat-scroller :options="options" :chatList="chatList" :loadHistory="loadHistory" @onPullingDown="loadHistory" :size="size" ref="scroller">
       <template slot="item" slot-scope="scope">
         <div>
-          {{scope.data.index}} : {{scope.height}}
+          {{scope.data}} : {{scope.height}}
         </div>
       </template>
       <template slot="pulldown-pull-to-load">
@@ -22,7 +22,6 @@
 <script>
 var count = 0
 var height = 0
-import data from './Data.js'
 export default {
   name: 'app',
   data () {
@@ -35,8 +34,8 @@ export default {
           threshold: 40,
           stop: 40
         },
-        observeDOM: false
-      }
+      },
+      size: 50
     }
   },
   created() {
@@ -49,24 +48,30 @@ export default {
         this.createDemoList()
         console.log(this.$refs.scroller)
         this.$refs.scroller.finishPullDown()
+        setTimeout(() => {
+          this.$refs.scroller.scrollToBottom()
+          console.log('scrollToBottom')
+        }, 3000)
       })
     },
     getData() {
       return new Promise(resolve => {
         setTimeout(() => {
-          resolve(data)
+          resolve()
         }, 3000)
       })
     },
     createDemoList() {
-      for (let i = 0; i < 10000; i++) {
+      for (let i = 0; i < 200; i++) {
         count++
-        height += (count % 3) === 0 ? 140 : (count % 3 === 1) ? 70 : (count % 3 === 2) ? 120 : 0
+        height = (count % 3) === 0 ? 140 : (count % 3 === 1) ? 70 : (count % 3 === 2) ? 120 : 0
         this.chatList.unshift({
-          index: count,
+          data: count,
+          height: height
         })
       }
     },
+    
     addStatsPanel() {
         if (window.requestIdleCallback) {
           let self = this
