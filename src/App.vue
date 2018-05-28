@@ -46,11 +46,9 @@ export default {
       this.getData().then(response => {
         console.log(response)
         this.createDemoList()
-        console.log(this.$refs.scroller)
         this.$refs.scroller.finishPullDown()
         setTimeout(() => {
           this.$refs.scroller.scrollToBottom()
-          console.log('scrollToBottom')
         }, 3000)
       })
     },

@@ -76,11 +76,8 @@ export default {
   },
   computed: {
     visibleItems() {
-      // return this.items.slice()
       /**
        * 保证滑动到底部一定有100个dom
-       * 如果 startItem - size + size * 2 >= startItem + size
-       * return startItem - size
        **/
       this.end = Math.min(this.items.length, this.startItem + this.size > this.size * 2 ? this.startItem + this.size : this.size * 2)
       if (this.end === this.items.length) {
@@ -171,7 +168,6 @@ export default {
           break
         }
       }
-      // this.scroll.refresh()
     },
     _setItem() {
       this.items = []
@@ -188,14 +184,18 @@ export default {
       })
       this.$forceUpdate()
     },
+    /**
+     * export api scrollToBottom
+     */
     scrollToBottom() {
       this.$nextTick(() => {
-        console.log(this.listTotalHeight)
         this.scroll.scrollTo(0, -this.listTotalHeight, 5000)
         this.scroll.refresh()
       })
     },
-    // export api finishPullDown
+    /**
+     * export api finishPullDown
+     */
     finishPullDown() {
         this.scroll.finishPullDown()
         this.loadingData = false
