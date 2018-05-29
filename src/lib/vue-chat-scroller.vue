@@ -45,7 +45,8 @@ export default {
       windowHeight: 0,
       start: 0,
       end: 0,
-      startHeight: 0
+      startHeight: 0,
+      topOffsetHeight: 0
     }
   },
   props: {
@@ -149,14 +150,18 @@ export default {
     _onPullingDown() {
       if (this.chatList.length > 0) {
         this.topItem = `.${this.itemClass}-${this.chatList.length}`
+        this.topOffsetHeight = this.listTotalHeight
       }
       this.loadingData = true
       this.$emit('onPullingDown')
     },
     _onRefresh() {
       if (this.scrollToElementCallBackBoolean === true) {
-        this.scroll.scrollToElement(this.topItem, 0, false, -(this.options.pullDownRefresh.threshold || 40))
+        // let height = this.listTotalHeight - this.topOffsetHeight
+        // console.log(height)
+        // this.scroll.scrollTo(0, -height, 0)
         setTimeout(() => {
+          this.scroll.scrollToElement(this.topItem, 0, false, -(this.options.pullDownRefresh.threshold || 40))
           this._setPullDownBlockY({
             y: 0
           })
