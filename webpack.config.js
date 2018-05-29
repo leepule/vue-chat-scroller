@@ -9,7 +9,9 @@ module.exports = {
         publicPath: '/dist/',
         // filename: 'build.js'
         filename: 'vue-chat-scroller.js',
-        library: 'vueChatScroller',
+        library: 'VueChatScroller',
+        libraryTarget: 'umd',
+        umdNamedDefine: true
     },
     module: {
         rules: [{

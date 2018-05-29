@@ -1,8 +1,8 @@
-import VueChatScroller from './vue-chat-scroller.vue'
+import vueChatScroller from './vue-chat-scroller.vue'
 
 const chatScroller = {
     install(Vue, options) {
-        Vue.component(VueChatScroller.name, VueChatScroller)
+        Vue.component(vueChatScroller.name, vueChatScroller)
     }
 }
 

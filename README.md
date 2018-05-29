@@ -22,7 +22,7 @@ npm run build
     Vue.use(VueChatScroller)
  
     // 作为组件的方式使用
-    <vue-pay-keyboard></vue-pay-keyboard>
+    <vue-chat-scroller></vue-chat-scroller>
 ```
 
 ### Props
