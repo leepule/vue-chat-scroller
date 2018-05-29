@@ -39,7 +39,6 @@ export default {
       pullDownBlockY: 0,
       loadingData: false,
       items: [],
-      itemClass: 'item',
       scrollToElementCallBackBoolean: false,
       currentHeight: 0,
       startItem: 0,
@@ -60,6 +59,10 @@ export default {
           stop: 40
         }
       }
+    },
+    itemClass: {
+      type: String,
+      default: 'item'
     },
     chatList: {
       type: Array,
