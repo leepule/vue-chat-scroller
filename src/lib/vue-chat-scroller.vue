@@ -19,10 +19,10 @@
         </span>
       </div>
       <!--  :style="{visibility: item.height >= currentHeight - 500 ? 'visible': 'hidden'}" -->
-      <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index}`" :key="item.data" :style="{'height': `${item.height}px`}">
-        <slot name="item" :data="item.data" :height="item.__height__">
+      <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index % 3}`" :key="item.index">
+        <slot name="item" :data="item.data" :height="item.height">
           <div>
-            {{item.index}}
+            {{item.index}} : {{item.height}}
           </div>
         </slot>
       </li>
@@ -49,6 +49,7 @@ export default {
       windowHeight: 0,
       start: 0,
       end: 0,
+      startHeight: 0
     }
   },
   props: {
@@ -89,8 +90,8 @@ export default {
       } else {
         this.start = Math.max(0, this.startItem - this.size)
       }
+      this._setStartHeight()
       return this.items.slice(this.start, this.end)
-      // return this.items.slice(Math.max(0, this.startItem - this.size), Math.min(this.items.length, (this.startItem + this.size) >= (this.startItem + this.size * 2) ? (this.starItem + this.size) : (this.startItem + this.size * 2)))
     },
     listTotalHeight() {
       let height = 0
@@ -100,7 +101,7 @@ export default {
       return height
     },
     listPaddingTop() {
-      return this.visibleItems[0] ? ((this.visibleItems[0].__height__ - this.visibleItems[0].height) > 0 ? (this.visibleItems[0].__height__ - this.visibleItems[0].height) : 0) : 0
+      return this.visibleItems[0] ? ((this.startHeight - this.visibleItems[0].height) > 0 ? (this.startHeight - this.visibleItems[0].height) : 0) : 0
     },
     listPaddingBottom() {
       return this.listTotalHeight - this.listPaddingTop - this.showableHeight
@@ -116,6 +117,11 @@ export default {
   watch: {
     chatList() {
       this._setItem()
+    },
+    visibleItems() {
+      this.$nextTick(() => {
+        this._setItemHeight()
+      })
     }
   },
   created() {
@@ -158,6 +164,17 @@ export default {
         this.scrollToElementCallBackBoolean = false
       }
     },
+    _setStartHeight() {
+      let height = 0
+      for (let i = 0; i < this.items.length; i++) {
+        if (i <= this.start) {
+          height += this.items[i].height
+        } else {
+          break
+        }
+      }
+      this.startHeight = height
+    },
     _setPullDownBlockY(pos) {
       if (pos.y > 0) {
         this.pullDownBlockY = pos.y
@@ -166,8 +183,10 @@ export default {
       }
     },
     _updateStartItem(pos) {
+      let counter = 0
       for (let i = 0; i < this.items.length; i++) {
-        if (this.items[i].__height__ > this.currentHeight) {
+        counter += this.items[i].height
+        if (counter > this.currentHeight) {
           this.startItem = Math.max(0, i)
           break
         }
@@ -176,17 +195,23 @@ export default {
     _setItem() {
       this.items = []
       let index = 0
-      let heightCounter = 0
       this.chatList.forEach((item, index) => {
-        heightCounter += heightCounter + item.height ? item.height : 80
         this.items.push({
-          data: item.data,
-          index: ++index,
-          height: item.height,
-          __height__: heightCounter
+          data: item,
+          index: index++,
+          height: 0
         })
       })
       this.$forceUpdate()
+      
+    },
+    _setItemHeight() {
+      let totalItemsHeight = 0
+      this.visibleItems.forEach(item => {
+        if (this.$refs['item-' + item.index]) {
+          item.height = this.$refs['item-' + item.index][0].offsetHeight
+        }
+      })
     },
     /**
      * export api scrollToBottom

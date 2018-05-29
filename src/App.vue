@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <vue-chat-scroller :options="options" :chatList="chatList" @onPullingDown="loadHistory" :size="size" ref="scroller">
+    <vue-chat-scroller :options="options" :chatList="chatList" :loadHistory="loadHistory" @onPullingDown="loadHistory" :size="size" ref="scroller">
       <template slot="item" slot-scope="scope">
         <div>
           {{scope.data}} : {{scope.height}}
@@ -41,15 +41,17 @@ export default {
   created() {
     this.addStatsPanel()
   },
+  mounted() {
+  },
   methods: {
     loadHistory() {
       this.getData().then(response => {
         console.log(response)
         this.createDemoList()
         this.$refs.scroller.finishPullDown()
-        setTimeout(() => {
-          this.$refs.scroller.scrollToBottom()
-        }, 3000)
+        // setTimeout(() => {
+        //   this.$refs.scroller.scrollToBottom()
+        // }, 3000)
       })
     },
     getData() {
@@ -64,12 +66,10 @@ export default {
         count++
         height = (count % 3) === 0 ? 140 : (count % 3 === 1) ? 70 : (count % 3 === 2) ? 120 : 0
         this.chatList.unshift({
-          data: count,
-          height: height
+          count
         })
       }
     },
-    
     addStatsPanel() {
         if (window.requestIdleCallback) {
           let self = this
@@ -109,15 +109,15 @@ li {
   align-items: center;
   border: 1px solid #000000;
 }
-// .item-0 {
-//   height: 140px;
-// }
-// .item-1 {
-//   height: 70px;
-// }
-// .item-2 {
-//   height: 120px;
-// }
+.item-0 {
+  height: 140px;
+}
+.item-1 {
+  height: 70px;
+}
+.item-2 {
+  height: 120px;
+}
 html, body {
   margin: 0;
   background-color: yellow;
