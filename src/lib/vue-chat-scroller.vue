@@ -143,9 +143,9 @@ export default {
       this.currentHeight = pos.y < 0 ? Math.abs(pos.y) : 0
       this._setPullDownBlockY(pos)
       this._updateStartItem(pos)
-      if (pos.y < 0 && this.visibleItems.length >= this.size * 2) {
-        this.scroll.refresh()
-      }
+      // if (pos.y < 0 && this.visibleItems.length >= this.size * 2) {
+      //   this.scroll.refresh()
+      // }
     },
     _onPullingDown() {
       if (this.chatList.length > 0) {
@@ -162,6 +162,7 @@ export default {
         // this.scroll.scrollTo(0, -height, 0)
         setTimeout(() => {
           this.scroll.scrollToElement(this.topItem, 0, false, true)
+          console.log('_onRefresh')
           this._setPullDownBlockY({
             y: 0
           })
