@@ -46,7 +46,6 @@ export default {
   methods: {
     loadHistory() {
       this.getData().then(response => {
-        console.log(response)
         this.createDemoList()
         this.$refs.scroller.finishPullDown()
         // setTimeout(() => {
@@ -108,6 +107,7 @@ li {
   justify-content: center;
   align-items: center;
   border: 1px solid #000000;
+  height: 90px;
 }
 .item-0 {
   height: 140px;
