@@ -61,7 +61,7 @@ export default {
       })
     },
     createDemoList() {
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 50; i++) {
         count++
         height = (count % 3) === 0 ? 140 : (count % 3 === 1) ? 70 : (count % 3 === 2) ? 120 : 0
         this.chatList.unshift({

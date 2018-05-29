@@ -226,12 +226,14 @@ export default {
      * export api finishPullDown
      */
     finishPullDown() {
-        this.scroll.finishPullDown()
+        this.scrollToElementCallBackBoolean = true
         this.loadingData = false
-        this.$nextTick(() => {
-          this.scrollToElementCallBackBoolean = true
+        setTimeout(() => {
           this.scroll.refresh()
-        })
+          setTimeout(() => {
+            this.scroll.finishPullDown()
+          }, 500)
+        }, 100)
     }
   },
 }
