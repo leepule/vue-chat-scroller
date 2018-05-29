@@ -1,14 +1,14 @@
 var path = require('path')
 var webpack = require('webpack')
-
+console.log('env', process.env.NODE_ENV)
 module.exports = {
-    // entry: './src/main.js', // dev
-    entry: './src/lib/index.js', // production
+    entry: process.env.NODE_ENV === 'development' ? './src/main.js' : './src/lib/index.js', // dev : production
+    // entry: './src/lib/index.js', // production
     output: {
         path: path.resolve(__dirname, './dist'),
         publicPath: '/dist/',
-        // filename: 'build.js', // dev
-        filename: 'vue-chat-scroller.js', // production
+        filename: process.env.NODE_ENV === 'development' ? 'build.js' : 'vue-chat-scroller.js', // dev : production
+        // filename: 'vue-chat-scroller.js', // production
         library: 'VueChatScroller',
         libraryTarget: 'umd',
         umdNamedDefine: true
