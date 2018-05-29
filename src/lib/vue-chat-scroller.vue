@@ -224,7 +224,7 @@ export default {
      */
     scrollToBottom() {
       this.$nextTick(() => {
-        this.scroll.scrollTo(0, -this.listTotalHeight, 1500)
+        this.scroll.scrollTo(0, -this.currentHeight, 500)
       })
     },
     /**
