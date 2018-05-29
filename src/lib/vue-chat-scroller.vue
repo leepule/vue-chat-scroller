@@ -19,11 +19,8 @@
         </span>
       </div>
       <!--  :style="{visibility: item.height >= currentHeight - 500 ? 'visible': 'hidden'}" -->
-      <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index % 3}`" :key="item.index">
+      <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index}`" :key="item.index">
         <slot name="item" :data="item.data" :height="item.height">
-          <div>
-            {{item.index}} : {{item.height}}
-          </div>
         </slot>
       </li>
     </ul>
