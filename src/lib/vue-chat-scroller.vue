@@ -191,11 +191,11 @@ export default {
     },
     _setItem() {
       this.items = []
-      let index = 0
-      this.chatList.forEach((item, index) => {
+      let index = this.chatList.length
+      this.chatList.forEach(item => {
         this.items.push({
           data: item,
-          index: index++,
+          index: index--,
           height: 0
         })
       })
