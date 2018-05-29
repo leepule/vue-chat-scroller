@@ -161,7 +161,7 @@ export default {
         // console.log(height)
         // this.scroll.scrollTo(0, -height, 0)
         setTimeout(() => {
-          this.scroll.scrollToElement(this.topItem, 0, false, -(this.options.pullDownRefresh.threshold || 40))
+          this.scroll.scrollToElement(this.topItem, 0, false, true)
           this._setPullDownBlockY({
             y: 0
           })
