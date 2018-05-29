@@ -1,7 +1,7 @@
 {
     "name": "vue-chat-scroller",
     "description": "A vue.js chat scroller",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "author": "d0onmax95@gmail.com",
     "license": "MIT",
     "private": false,
