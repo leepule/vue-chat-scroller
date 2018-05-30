@@ -207,7 +207,7 @@ export default {
     },
     _updateAddMessageItems(oldListLength, newListLength) {
       let list = []
-      for (let i = oldListLength - 1; i < newListLength - 1; i++) {
+      for (let i = oldListLength; i < newListLength; i++) {
         list.push({
           data: this.chatList[i],
           index: this.itemIndex,

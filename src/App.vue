@@ -43,7 +43,8 @@ export default {
     }
   },
   created() {
-    this.addStatsPanel()
+    // this.addStatsPanel()
+    this.addFpsPanel()
   },
   mounted() {
     // let a = new Set([1, 2, 3]);
@@ -115,7 +116,7 @@ export default {
           let stats = new Stats()
           let domPanel = new Stats.Panel('D', '#0ff', '#002')
           stats.addPanel(domPanel)
-          stats.showPanel(3)
+          stats.showPanel(1)
           document.body.appendChild(stats.dom)
           setTimeout(function timeoutFunc() {
             // Only update DOM node graph when we have time to spare to call
@@ -126,6 +127,25 @@ export default {
             })
           }, 100)
         }
+      },
+      addFpsPanel() {
+        var stats = new Stats();
+        stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild( stats.dom );
+
+        function animate() {
+
+          stats.begin();
+
+          // monitored code goes here
+
+          stats.end();
+
+          requestAnimationFrame( animate );
+
+        }
+
+        requestAnimationFrame( animate );
       },
       numDomNodes(node) {
         if(!node.children || node.children.length == 0) return 0
