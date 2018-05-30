@@ -230,7 +230,7 @@ export default {
      * export api scrollToBottom
      */
     scrollToBottom() {
-      this.setTimeout(() => {
+      setTimeout(() => {
         let h = this.listTotalHeight - this.windowHeight
         this.scroll.scrollTo(0, -h, 300)
       }, 100)
