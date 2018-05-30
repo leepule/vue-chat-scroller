@@ -60,9 +60,6 @@ export default {
     // let differenceABSet = new Set([...b].filter(x => !a.has(x)));
     // // [1]
     // console.log(differenceABSet)
-    window.onresize = () => {
-      this.$refs.scroller.resizeWindow()
-    }
   },
   methods: {
     loadHistory() {

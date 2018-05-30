@@ -131,7 +131,6 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.scroll = new BScroll(this.$refs.scroller, this.options)
-      this.resizeWindow()
       this.scroll.on('scroll', this._onScroll)
       this.scroll.on('pullingDown', this._onPullingDown)
       this.scroll.on('refresh', this._onRefresh)
@@ -165,6 +164,7 @@ export default {
         }, 60)
         this.scrollToElementCallBackBoolean = false
       }
+      this.resizeWindow()
     },
     _setStartHeight() {
       let height = 0
@@ -220,15 +220,16 @@ export default {
         }
       })
     },
-    /**
-     * export api resizeWindow
-     */
     resizeWindow(animateTime = 300) {
-      return new Promise(resolve => {
-        setTimeout(() => {
+      // return new Promise(resolve => {
+      //   setTimeout(() => {
+      //     this.windowHeight = this.$el.offsetHeight
+      //     resolve()
+      //   }, animateTime)
+      // })
+        if (this.windowHeight !== this.$el.offsetHeight) {
           this.windowHeight = this.$el.offsetHeight
-        }, animateTime)
-      })
+        }
     },
     /**
      * export api scrollToBottom
