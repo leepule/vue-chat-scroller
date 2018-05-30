@@ -46,7 +46,8 @@ export default {
       start: 0,
       end: 0,
       startHeight: 0,
-      topOffsetHeight: 0
+      topOffsetHeight: 0,
+      chatListLength: 0
     }
   },
   props: {
@@ -130,12 +131,11 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.scroll = new BScroll(this.$refs.scroller, this.options)
-      window.scroll = this.scroll
-      this.loadHistory()
       this.windowHeight = this.$el.offsetHeight
       this.scroll.on('scroll', this._onScroll)
       this.scroll.on('pullingDown', this._onPullingDown)
       this.scroll.on('refresh', this._onRefresh)
+      this.loadHistory()
     })
   },
   methods: {
@@ -143,9 +143,9 @@ export default {
       this.currentHeight = pos.y < 0 ? Math.abs(pos.y) : 0
       this._setPullDownBlockY(pos)
       this._updateStartItem(pos)
-      // if (pos.y < 0 && this.visibleItems.length >= this.size * 2) {
-      //   this.scroll.refresh()
-      // }
+      if (pos.y < 0) {
+        this.scroll.refresh()
+      }
     },
     _onPullingDown() {
       if (this.chatList.length > 0) {
@@ -157,12 +157,8 @@ export default {
     },
     _onRefresh() {
       if (this.scrollToElementCallBackBoolean === true) {
-        // let height = this.listTotalHeight - this.topOffsetHeight
-        // console.log(height)
-        // this.scroll.scrollTo(0, -height, 0)
         setTimeout(() => {
           this.scroll.scrollToElement(this.topItem, 0, false, true)
-          console.log('_onRefresh')
           this._setPullDownBlockY({
             y: 0
           })
@@ -199,23 +195,28 @@ export default {
       }
     },
     _setItem() {
-      this.items = []
-      let index = this.chatList.length
-      this.chatList.forEach(item => {
-        this.items.push({
-          data: item,
+      // this.items = []
+      // let index = 0
+      let index = this.chatList.length - 1
+      let list = []
+      for (let i = 0; i < this.chatList.length - this.chatListLength; i++) {
+        list.push({
+          data: this.chatList[i],
           index: index--,
           height: 0
         })
-      })
+      }
+      this.items = [...list, ...this.items]
+      this.chatListLength = this.chatList.length
       this.$forceUpdate()
-      
     },
     _setItemHeight() {
       let totalItemsHeight = 0
-      this.visibleItems.forEach(item => {
+      this.items.forEach(item => {
         if (this.$refs['item-' + item.index]) {
-          item.height = this.$refs['item-' + item.index][0].offsetHeight
+          if (this.$refs['item-' + item.index][0]) {
+            item.height = this.$refs['item-' + item.index][0].offsetHeight
+          }
         }
       })
     },

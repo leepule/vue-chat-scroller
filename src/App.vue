@@ -16,6 +16,9 @@
         <div>33333</div>
       </template>
     </vue-chat-scroller>
+    <div class="scroll-to-bottom-btn" @click="scrollToBottom">
+      scroll to bottom
+    </div>
   </div>
 </template>
 
@@ -42,6 +45,21 @@ export default {
     this.addStatsPanel()
   },
   mounted() {
+    // let a = new Set([1, 2, 3]);
+    // let b = new Set([3, 5, 2]); 
+
+    // // 并集
+    // let unionSet = new Set([...a, ...b]);
+    // //[1,2,3,5]
+    // console.log(unionSet)
+    // // 交集
+    // let intersectionSet = new Set([...a].filter(x => b.has(x)));
+    // // [2,3]
+    // console.log(intersectionSet)
+    // // ab差集
+    // let differenceABSet = new Set([...b].filter(x => !a.has(x)));
+    // // [1]
+    // console.log(differenceABSet)
   },
   methods: {
     loadHistory() {
@@ -68,6 +86,12 @@ export default {
           count
         })
       }
+    },
+    scrollToBottom() {
+      let h = this.$refs.scroller.listTotalHeight - this.$refs.scroller.windowHeight
+      console.log(h)
+      this.$refs.scroller.scroll.scrollTo(0, -h, 300)
+      console.log(this.$refs.scroller.scroll)
     },
     addStatsPanel() {
         if (window.requestIdleCallback) {
@@ -126,6 +150,17 @@ html, body {
   flex: 1;
   height: 100%;
   width: 100%;
+}
+.scroll-to-bottom-btn {
+  background-color: burlywood;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 40px;
+  width: 100px;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 </style>
