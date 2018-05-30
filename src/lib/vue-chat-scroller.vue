@@ -131,7 +131,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.scroll = new BScroll(this.$refs.scroller, this.options)
-      this.windowHeight = this.$el.offsetHeight
+      this.resizeWindow()
       this.scroll.on('scroll', this._onScroll)
       this.scroll.on('pullingDown', this._onPullingDown)
       this.scroll.on('refresh', this._onRefresh)
@@ -221,12 +221,19 @@ export default {
       })
     },
     /**
+     * export api resizeWindow
+     */
+    resizeWindow() {
+      this.windowHeight = this.$el.offsetHeight
+    },
+    /**
      * export api scrollToBottom
      */
     scrollToBottom() {
-      this.$nextTick(() => {
-        this.scroll.scrollTo(0, -this.currentHeight, 500)
-      })
+      this.setTimeout(() => {
+        let h = this.listTotalHeight - this.windowHeight
+        this.scroll.scrollTo(0, -h, 300)
+      }, 100)
     },
     /**
      * export api finishPullDown
