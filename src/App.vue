@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <vue-chat-scroller :options="options" :chatList="chatList" :loadHistory="loadHistory" @onPullingDown="loadHistory" :size="size" ref="scroller">
+    <vue-chat-scroller :options="options" :loadHistory="loadHistory" @onPullingDown="loadHistory" :size="size" ref="scroller">
       <template slot="item" slot-scope="scope">
-        <div>
+        <div :key="scope.data.index">
           {{scope.data}} : {{scope.height}}
         </div>
       </template>
@@ -19,17 +19,17 @@
     <div class="scroll-to-bottom-btn" @click="scrollToBottom">
       scroll to bottom
     </div>
+    <div class="send-message-btn" @click="sendMessage">
+      send message
+    </div>
   </div>
 </template>
 
 <script>
-var count = 0
-var height = 0
 export default {
   name: 'app',
   data () {
     return {
-      chatList: [],
       options: {
         scrollbar: true,
         probeType: 3,
@@ -38,6 +38,7 @@ export default {
           stop: 40
         },
       },
+      count: 0,
       size: 50
     }
   },
@@ -64,8 +65,9 @@ export default {
   methods: {
     loadHistory() {
       this.getData().then(response => {
-        this.createDemoList()
+        console.log(response)
         this.$refs.scroller.finishPullDown()
+        this.$refs.scroller.loadMessage(response)
         // setTimeout(() => {
         //   this.$refs.scroller.scrollToBottom()
         // }, 3000)
@@ -74,24 +76,38 @@ export default {
     getData() {
       return new Promise(resolve => {
         setTimeout(() => {
-          resolve()
+          let data = this.createDemoList()
+          resolve(data)
         }, 3000)
       })
     },
     createDemoList() {
+      let list = []
       for (let i = 0; i < 50; i++) {
-        count++
-        height = (count % 3) === 0 ? 140 : (count % 3 === 1) ? 70 : (count % 3 === 2) ? 120 : 0
-        this.chatList.unshift({
-          count
+        this.count++
+        list.unshift({
+          count: this.count
         })
       }
+      return list
     },
     scrollToBottom() {
       let h = this.$refs.scroller.listTotalHeight - this.$refs.scroller.windowHeight
       console.log(h)
       this.$refs.scroller.scroll.scrollTo(0, -h, 300)
       console.log(this.$refs.scroller.scroll)
+    },
+    sendMessage() {
+      this.count++
+      console.log(this.count)
+      this.$refs.scroller.addMessage([
+        {
+          count: this.count
+        }
+      ])
+      setTimeout(() => {
+        this.scrollToBottom()
+      }, 100)
     },
     addStatsPanel() {
         if (window.requestIdleCallback) {
@@ -156,6 +172,17 @@ html, body {
   position: absolute;
   bottom: 0;
   right: 0;
+  height: 40px;
+  width: 100px;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.send-message-btn {
+  background-color: burlywood;
+  position: absolute;
+  bottom: 0;
+  left: 0;
   height: 40px;
   width: 100px;
   text-align: center;

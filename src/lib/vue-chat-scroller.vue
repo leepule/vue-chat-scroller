@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       topItem: '',
+      chatList: [],
       scroll: null,
       scrollPaddingBottom: 0,
       pullDownBlockY: 0,
@@ -47,7 +48,8 @@ export default {
       end: 0,
       startHeight: 0,
       topOffsetHeight: 0,
-      chatListLength: 0
+      chatListLength: 0,
+      itemIndex: 1
     }
   },
   props: {
@@ -66,10 +68,7 @@ export default {
       type: String,
       default: 'item'
     },
-    chatList: {
-      type: Array,
-      default: []
-    },
+    
     loadHistory: {
       type: Function,
       default: () => {
@@ -117,9 +116,6 @@ export default {
     }
   },
   watch: {
-    chatList() {
-      this._setItem()
-    },
     visibleItems() {
       this.$nextTick(() => {
         this._setItemHeight()
@@ -157,11 +153,11 @@ export default {
     _onRefresh() {
       if (this.scrollToElementCallBackBoolean === true) {
         setTimeout(() => {
-          this.scroll.scrollToElement(this.topItem, 0, false, true)
+          this.scroll.scrollToElement(this.topItem, 0, false, 0)
           this._setPullDownBlockY({
             y: 0
           })
-        }, 60)
+        }, 100)
         this.scrollToElementCallBackBoolean = false
       }
       this.resizeWindow()
@@ -194,22 +190,6 @@ export default {
         }
       }
     },
-    _setItem() {
-      // this.items = []
-      // let index = 0
-      let index = this.chatList.length - 1
-      let list = []
-      for (let i = 0; i < this.chatList.length - this.chatListLength; i++) {
-        list.push({
-          data: this.chatList[i],
-          index: index--,
-          height: 0
-        })
-      }
-      this.items = [...list, ...this.items]
-      this.chatListLength = this.chatList.length
-      this.$forceUpdate()
-    },
     _setItemHeight() {
       let totalItemsHeight = 0
       this.items.forEach(item => {
@@ -220,16 +200,35 @@ export default {
         }
       })
     },
-    resizeWindow(animateTime = 300) {
-      // return new Promise(resolve => {
-      //   setTimeout(() => {
-      //     this.windowHeight = this.$el.offsetHeight
-      //     resolve()
-      //   }, animateTime)
-      // })
+    resizeWindow() {
         if (this.windowHeight !== this.$el.offsetHeight) {
           this.windowHeight = this.$el.offsetHeight
         }
+    },
+    _updateAddMessageItems(oldListLength, newListLength) {
+      let list = []
+      for (let i = oldListLength - 1; i < newListLength - 1; i++) {
+        list.push({
+          data: this.chatList[i],
+          index: this.itemIndex,
+          height: 0
+        })
+        this.itemIndex++
+      }
+      this.items = [...this.items, ...list]
+    },
+    
+    _updateLoadMessageItems(oldListLength, newListLength) {
+      let list = []
+      for (let i = newListLength - oldListLength - 1; i >= 0; i--) {
+        list.unshift({
+          data: this.chatList[i],
+          index: this.itemIndex,
+          height: 0
+        })
+        this.itemIndex++
+      }
+      this.items = [...list, ...this.items]
     },
     /**
      * export api scrollToBottom
@@ -239,6 +238,24 @@ export default {
         let h = this.listTotalHeight - this.windowHeight
         this.scroll.scrollTo(0, -h, 300)
       }, 100)
+    },
+    /**
+     * export api add message
+     */
+    addMessage(msgList) {
+      let oldListLength = this.chatList.length
+      this.chatList = [...this.chatList, ...msgList]
+      let newListLength = this.chatList.length
+      this._updateAddMessageItems(oldListLength, newListLength)
+    },
+    /**
+     * export api load message
+     */
+    loadMessage(msgList) {
+      let oldListLength = this.chatList.length
+      this.chatList = [...msgList, ...this.chatList]
+      let newListLength = this.chatList.length
+      this._updateLoadMessageItems(oldListLength, newListLength)
     },
     /**
      * export api finishPullDown
