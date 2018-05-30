@@ -223,8 +223,12 @@ export default {
     /**
      * export api resizeWindow
      */
-    resizeWindow() {
-      this.windowHeight = this.$el.offsetHeight
+    resizeWindow(animateTime = 300) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          this.windowHeight = this.$el.offsetHeight
+        }, animateTime)
+      })
     },
     /**
      * export api scrollToBottom
