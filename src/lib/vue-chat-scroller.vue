@@ -2,7 +2,7 @@
   <div class="vue-chat-scroller" ref="scroller">
     <ul class="vue-chat-list" :style="{paddingTop: `${listPaddingTop}px`, paddingBottom: `${listPaddingBottom}px`}">
       <div class="pulldown" :style="{height: `${pullDownBlockY}px`}" v-show="pullDownBlockY > 5">
-        <span v-show="(pullDownBlockY < (options.pullDownRefresh.threshold || 40)) && !loadingData">
+        <span v-show="(pullDownBlockY < (options.pullDownRefresh.threshold || 40)) && !loadingData && pullDownBlockY > 20">
           <slot name="pulldown-pull-to-load">
             pull down to load data
           </slot>
@@ -18,7 +18,6 @@
           </slot>
         </span>
       </div>
-      <!--  :style="{visibility: item.height >= currentHeight - 500 ? 'visible': 'hidden'}" -->
       <li :ref="`${itemClass}-${item.index}`" v-for="item in visibleItems" :class="`${itemClass}-${item.index}`" :key="item.index">
         <slot name="item" :data="item.data" :height="item.height">
         </slot>
@@ -49,7 +48,7 @@ export default {
       startHeight: 0,
       topOffsetHeight: 0,
       chatListLength: 0,
-      itemIndex: 1
+      itemIndex: 1,
     }
   },
   props: {
@@ -113,6 +112,9 @@ export default {
         height += item.height
       })
       return height
+    },
+    scrollToBottomBtn() {
+      return this.listTotalHeight - this.currentHeight < 1500 ? false : true
     }
   },
   watch: {
